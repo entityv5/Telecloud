@@ -1,5 +1,5 @@
 import os
-from utils.uploadFuncs import uploadFile, checkFilePathLength
+from utils.uploadFuncs import checkFilePathLength, uploadFile
 
 try:
     from pyrogram import Client
@@ -27,8 +27,8 @@ def main():
 
     filePath: str = input("Enter the file path: ")
 
-    checkFilePathLength(filePath)
-    uploadFile(app, filePath)
+    if checkFilePathLength(filePath) == True:
+        uploadFile(app, filePath)
 
 
     app.stop()
