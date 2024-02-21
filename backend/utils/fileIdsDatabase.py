@@ -7,19 +7,31 @@ cursor: object = connection.cursor()
 cursor.execute("CREATE TABLE IF NOT EXISTS files (file TEXT, fileID TEXT)")
 
 
-def addFile(filePath: str, fileID: str):
+def addItem(filePath: str, fileID: str = None):
     cursor.execute("INSERT INTO files (file, fileID) VALUES (?, ?)", (filePath, fileID))
     
     connection.commit()
 
 
-def retrieveFile(filePath: str):
+def checkItemExists(filePath: str):
+    cursor.execute("SELECT file FROM files WHERE file = ?", (filePath,))
+    
+    if cursor.fetchone() == None: return False
+    else: return True
+
+
+def retrieveItem(filePath: str):
     cursor.execute("SELECT fileID FROM files WHERE file = ?", (filePath,))
     
     return cursor.fetchone()
 
 
-def retrieveAllFilesInDirectory(directory: str):
-    cursor.execute("SELECT file, fileID FROM files WHERE file LIKE ?", (f"{directory}%",))
-    
-    return cursor.fetchall()
+def retrieveAllItemsInDirectory(directory: str):
+    # return files in the directory along with the subdirectories in that directory
+    cursor.execute("SELECT file, fileID FROM files WHERE file LIKE ? OR file NOT LIKE ?", (f"{directory}%/", f"{directory}%/%"))
+    items = cursor.fetchall()
+
+    # only keep subdirectories that are directly in the directory passed in to the function
+    filteredItems = [item for item in items if item[0].count("/") == directory.count("/") + 1]
+
+    return filteredItems

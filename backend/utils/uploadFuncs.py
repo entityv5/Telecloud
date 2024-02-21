@@ -1,5 +1,5 @@
 from utils.miscFuncs import progress
-from utils.fileIdsDatabase import addFile
+from utils.fileIdsDatabase import checkItemExists, addItem
 import os
 
 
@@ -19,6 +19,19 @@ def uploadFile(app: object, filePath: str):
     app.send_document("me", filePath, progress=progress, caption=filePath)
     uploadedFile = list(app.get_chat_history("me", limit=1))[0].document.file_id
     
-    addFile(filePath, uploadedFile)
+
+    directories = filePath.split("/")
+    currentDirectory = ""
+
+    # create "directories" for the file's path if they don't already exist
+    for i in range(len(directories) - 1):
+        if directories[i]:
+            currentDirectory += f"{directories[i]}/"
+
+            if checkItemExists(currentDirectory) == False:
+                addItem(currentDirectory)
+
+    
+    addItem(filePath, uploadedFile)
 
     print("File(s) uploaded successfully.")
