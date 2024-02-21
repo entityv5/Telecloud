@@ -32,6 +32,6 @@ def retrieveAllItemsInDirectory(directory: str):
     items = cursor.fetchall()
 
     # only keep subdirectories that are directly in the directory passed in to the function
-    filteredItems = [item for item in items if item[0].count("/") == directory.count("/") + 1]
+    filteredItems = [item for item in items if item[0] != directory and item[0].count("/") < directory.count("/") + 2]
 
     return filteredItems
