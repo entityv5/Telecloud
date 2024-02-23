@@ -31,7 +31,7 @@ def retrieveAllItemsInDirectory(directory: str):
     cursor.execute("SELECT file, fileID FROM files WHERE file LIKE ? OR file NOT LIKE ?", (f"{directory}%/", f"{directory}%/%"))
     items = cursor.fetchall()
 
-    # only keep subdirectories that are directly in the directory passed in to the function
+    # filter out subdirectories that are not directly in the directory passed in to the function
     filteredItems = [item for item in items if item[0] != directory and item[0].count("/") < directory.count("/") + 2]
 
     return filteredItems

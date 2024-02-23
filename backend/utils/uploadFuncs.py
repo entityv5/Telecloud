@@ -1,5 +1,5 @@
-from utils.miscFuncs import progress
-from utils.fileIdsDatabase import checkItemExists, addItem
+from utils.miscFuncs import uploadProgress
+from utils.databaseFuncs import checkItemExists, addItem
 import os
 
 
@@ -16,9 +16,9 @@ def checkFilePath(filePath: str): # planned to implement support for larger file
 
 
 def uploadFile(app: object, filePath: str):
-    app.send_document("me", filePath, progress=progress, caption=filePath)
+    app.send_document("me", filePath, progress=uploadProgress, caption=filePath)
     uploadedFile = list(app.get_chat_history("me", limit=1))[0].document.file_id
-    
+
 
     directories = filePath.split("/")
     currentDirectory = ""
@@ -34,4 +34,20 @@ def uploadFile(app: object, filePath: str):
     
     addItem(filePath, uploadedFile)
 
-    print("File(s) uploaded successfully.")
+    print(f"File \"{filePath}\" uploaded successfully.")
+
+
+def performUpload(app: object):
+    filePath: str = input("Enter file path: ")
+
+
+    if checkFilePath(filePath) == True:
+        if os.path.isdir(filePath):
+            for dirpath, dirnames, filenames in os.walk(filePath):
+                for filename in filenames:
+                    filePath = os.path.join(dirpath, filename)
+                    
+                    if checkFilePath(filePath) == True:
+                        uploadFile(app, filePath)
+
+        else: uploadFile(app, filePath)
